@@ -123,10 +123,7 @@ def get_market_links(title, region_code):
         return (f"https://www.amazon.in/s?k={q}", f"https://www.flipkart.com/search?q={q}", "AMAZON.IN", "FLIPKART")
 
 def gemini_search_protocol(api_key, genre, region_code, currency_symbol):
-    """
-    Uses Gemini API to search for REAL prices on Google.
-    Includes Fallback for 404 Model Errors.
-    """
+   
     try:
         genai.configure(api_key=api_key)
         
