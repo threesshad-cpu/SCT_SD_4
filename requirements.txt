@@ -3,4 +3,5 @@ requests
 beautifulsoup4
 pandas
 numpy
+google.generativeai
 plotly
