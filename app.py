@@ -254,7 +254,7 @@ def simulation_protocol(genre, region_code):
     return db
 
 # --- UI HEADER ---
-st.markdown('<h1 style="font-weight:800; font-size:3.5rem; letter-spacing:-4px; margin-bottom:0;">OMNISCRAPER <span style="color:#06b6d4">v14.0</span></h1>', unsafe_allow_html=True)
+st.markdown('<h1 style="font-weight:800; font-size:3.5rem; letter-spacing:-4px; margin-bottom:0;">OMNISCRAPER <-> <span style="color:#06b6d4">Online E-Commerce</span></h1>', unsafe_allow_html=True)
 st.markdown('<p class="mono" style="color:#64748b;">>> ENTERPRISE INTELLIGENCE SYSTEM | REAL-TIME MARKET DATA</p>', unsafe_allow_html=True)
   
 with st.sidebar:
