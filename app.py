@@ -191,11 +191,40 @@ def simulation_protocol(genre, region_code):
         "Fiction": [
             ("The Midnight Library", 13.00), ("The Alchemist", 12.00), ("Klara and the Sun", 14.00),
             ("Where the Crawdads Sing", 11.00), ("Circe", 13.50)
+        ],
+        "Fantasy": [
+            ("Harry Potter and the Sorcerer's Stone", 12.00), ("The Hobbit", 14.00), ("A Game of Thrones", 16.00),
+            ("The Name of the Wind", 15.00), ("Fourth Wing", 18.00)
+        ],
+        "Self Help": [
+            ("The Subtle Art of Not Giving a F*ck", 14.00), ("How to Win Friends...", 13.00), 
+            ("The 4-Hour Workweek", 15.00), ("Can't Hurt Me", 17.00)
+        ],
+        "History": [
+            ("Sapiens", 18.00), ("Guns, Germs, and Steel", 16.00), ("The Wager", 17.00),
+            ("Devil in the White City", 15.00)
+        ],
+        "Thriller": [
+            ("The Da Vinci Code", 10.00), ("The Girl on the Train", 11.00), ("Verity", 13.00),
+            ("The Housemaid", 12.00)
+        ],
+        "Romance": [
+            ("It Ends with Us", 14.00), ("Pride and Prejudice", 8.00), ("Book Lovers", 13.00),
+            ("Red, White & Royal Blue", 15.00)
+        ],
+        "Biography": [
+            ("Steve Jobs", 18.00), ("Becoming", 19.00), ("Elon Musk", 20.00), ("Greenlights", 16.00)
+        ],
+        "Technology": [
+            ("The Innovators", 18.00), ("Life 3.0", 16.00), ("Chip War", 19.00), ("Clean Code", 25.00)
+        ],
+        "Philosophy": [
+            ("Meditations", 10.00), ("Beyond Good and Evil", 11.00), ("The Republic", 9.00), ("Sophie's World", 14.00)
         ]
     }
     
     # Default list if genre not in static DB
-    defaults = [("The Great Gatsby", 10.00), ("1984", 12.00), ("To Kill a Mockingbird", 11.00)]
+    defaults = [("The Great Gatsby", 10.00), ("1984", 12.00), ("To Kill a Mockingbird", 11.00), ("Animal Farm", 9.00)]
     books = library.get(genre, defaults)
     
     db = []
@@ -225,7 +254,7 @@ def simulation_protocol(genre, region_code):
     return db
 
 # --- UI HEADER ---
-st.markdown('<h1 style="font-weight:800; font-size:3.5rem; letter-spacing:-4px; margin-bottom:0;">OMNISCRAPER <-> <span style="color:#06b6d4">  E-Commerce </span></h1>', unsafe_allow_html=True)
+st.markdown('<h1 style="font-weight:800; font-size:3.5rem; letter-spacing:-4px; margin-bottom:0;">OMNISCRAPER <span style="color:#06b6d4">v14.0</span></h1>', unsafe_allow_html=True)
 st.markdown('<p class="mono" style="color:#64748b;">>> ENTERPRISE INTELLIGENCE SYSTEM | REAL-TIME MARKET DATA</p>', unsafe_allow_html=True)
   
 with st.sidebar:
@@ -262,12 +291,33 @@ with st.sidebar:
 if not blueprint_active:
     st.markdown("<style>.stApp { background-image: none !important; }</style>", unsafe_allow_html=True)
 
-# Must match keys in library dictionary
+# Expanded Genre List (20+ Categories)
 GENRES = {
-    "Science Fiction": "science-fiction_16", 
-    "Business": "business_35", 
-    "Mystery": "mystery_3", 
-    "Fiction": "fiction_10"
+    "Science Fiction": "science-fiction", 
+    "Business": "business", 
+    "Mystery": "mystery", 
+    "Fiction": "fiction",
+    "Fantasy": "fantasy",
+    "Romance": "romance",
+    "History": "history",
+    "Thriller": "thriller",
+    "Self Help": "self-help",
+    "Biography": "biography",
+    "Technology": "technology",
+    "Philosophy": "philosophy",
+    "Psychology": "psychology",
+    "Travel": "travel",
+    "Horror": "horror",
+    "Poetry": "poetry",
+    "Science": "science",
+    "Classics": "classics",
+    "Art": "art",
+    "Cooking": "cooking",
+    "Politics": "politics",
+    "Health": "health",
+    "Comics": "comics",
+    "Sports": "sports",
+    "Religion": "religion"
 }
 
 c1, c2 = st.columns([4, 1])
