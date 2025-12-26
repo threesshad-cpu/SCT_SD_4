@@ -1,0 +1,28 @@
+# --- Security (CRITICAL) ---
+# Never upload your API keys or environment secrets
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# --- Python ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments (If you use them)
+venv/
+env/
+.venv/
+
+# --- Web Development ---
+# Dependencies (These are too large for GitHub)
+node_modules/
+dist/
+build/
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
