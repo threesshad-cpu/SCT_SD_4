@@ -8,13 +8,16 @@ import random
 from datetime import datetime, timedelta
 import urllib.parse
 import plotly.express as px
-import google.generativeai as genai
+from google import genai
 import json
+import os
+from dotenv import load_dotenv
 import re
 
+load_dotenv()
 # --- CONFIGURATION ---
 # Access API key from secrets or use empty string for simulation mode
-GEMINI_API_KEY = "AIzaSyDr1RA4kexZWR94pmc1qJiIM_sF2qo2klE"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # --- SOFTWARE ARCHITECTURE CONFIG ---
 st.set_page_config(
@@ -123,49 +126,43 @@ def get_market_links(title, region_code):
         return (f"https://www.amazon.in/s?k={q}", f"https://www.flipkart.com/search?q={q}", "AMAZON.IN", "FLIPKART")
 
 def gemini_search_protocol(api_key, genre, region_code, currency_symbol):
-    """
-    Uses Gemini API to search for REAL prices.
-    Includes explicit instruction to ignore placeholder sites.
-    """
     try:
-        genai.configure(api_key=api_key)
-        
-        # Try Flash model first, fallback to Pro
-        try:
-            model = genai.GenerativeModel('gemini-1.5-flash')
-        except:
-            model = genai.GenerativeModel('gemini-pro')
-        
+        # Define the prompt first so it is available to the client
         prompt = f"""
         Act as a pricing engine. Identify 6 REAL, trending '{genre}' books (Bestsellers 2023-2025).
         For each, estimate the CURRENT market price (Paperback) in {currency_symbol} for the {region_code} market.
-        
-        CRITICAL: 
-        - Do NOT invent prices. Use actual approximate retail prices (e.g. $10-$20 USD, ₹300-₹600 INR).
-        - Ignore "A Light in the Attic" or other placeholder data.
-        
         Return ONLY a raw JSON list. No markdown.
-        Format:
-        [
-            {{ "Title": "Book Title", "Price": 14.99, "Rating": 5 }}
-        ]
+        Format: [ {{ "Title": "Book Title", "Price": 14.99, "Rating": 5 }} ]
         """
         
-        response = model.generate_content(prompt)
-        text_data = re.sub(r'```json\n|\n```', '', response.text).strip()
-        data = json.loads(text_data)
-        
-        enhanced_db = []
-        for item in data:
-            link1, link2, label1, label2 = get_market_links(item['Title'], region_code)
-            enhanced_db.append({
-                "Title": item['Title'], "Price": float(item['Price']), "Rating": int(item['Rating']),
-                "Link1": link1, "Link2": link2, "Label1": label1, "Label2": label2
-            })
-        return enhanced_db
+        # Try multiple endpoints and aliases to prevent 404
+        for version in ['v1', 'v1beta']:
+            try:
+                client = genai.Client(api_key=api_key, http_options={'api_version': version})
+                for m_id in ["gemini-1.5-flash", "models/gemini-1.5-flash"]:
+                    try:
+                        response = client.models.generate_content(model=m_id, contents=prompt)
+                        if response and response.text:
+                            text_data = re.sub(r'```json\n|\n```', '', response.text).strip()
+                            data = json.loads(text_data)
+                            
+                            enhanced_db = []
+                            for item in data:
+                                link1, link2, label1, label2 = get_market_links(item['Title'], region_code)
+                                enhanced_db.append({
+                                    "Title": item['Title'], 
+                                    "Price": float(item['Price']), 
+                                    "Rating": int(item['Rating']),
+                                    "Link1": link1, "Link2": link2, 
+                                    "Label1": label1, "Label2": label2
+                                })
+                            return enhanced_db
+                    except: continue
+            except: continue
     except Exception as e:
-        print(f"Gemini Error: {e}")
+        print(f"Neural Engine Final Error: {e}")
         return None
+
 
 def simulation_protocol(genre, region_code):
     """
@@ -324,7 +321,7 @@ c1, c2 = st.columns([4, 1])
 with c1:
     target = st.selectbox("TARGET E-COMMERCE SEGMENT", list(GENRES.keys()), label_visibility="collapsed")
 with c2:
-    trigger = st.button("INITIALIZE ENGINE", use_container_width=True)
+    trigger = st.button("INITIALIZE ENGINE", width="stretch")
 
 if trigger:
     term = st.empty()
@@ -401,7 +398,7 @@ if trigger:
             else:
                 fig = px.density_heatmap(df, x="Price", y="Rating", template="plotly_dark", color_continuous_scale="Viridis")
             fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', transition_duration=1500)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
 
         if neural_active:
             with tabs[1]:
@@ -456,4 +453,4 @@ if trigger:
                     """, unsafe_allow_html=True)
             
             st.divider()
-            st.download_button("💾 DOWNLOAD MASTER SYSTEM LEDGER (CSV)", df.to_csv(index=False).encode('utf-8'), f"omniscraper_v13_{region_code}_{target.lower()}.csv", use_container_width=True)
+            st.download_button("💾 DOWNLOAD MASTER SYSTEM LEDGER (CSV)", df.to_csv(index=False).encode('utf-8'), f"omniscraper.csv", width="stretch")
