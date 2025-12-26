@@ -1,7 +1,7 @@
 streamlit
-requests
-beautifulsoup4
+google-genai
+python-dotenv
 pandas
-numpy
 plotly
-google.generativeai
+beautifulsoup4
+requests
