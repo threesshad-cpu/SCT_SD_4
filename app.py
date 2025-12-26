@@ -127,42 +127,43 @@ def get_market_links(title, region_code):
 
 def gemini_search_protocol(api_key, genre, region_code, currency_symbol):
     try:
-        # Define the prompt first so it is available to the client
+        # 1. Initialize Client ONCE
+        client = genai.Client(api_key=api_key)
+        
         prompt = f"""
         Act as a pricing engine. Identify 6 REAL, trending '{genre}' books (Bestsellers 2023-2025).
         For each, estimate the CURRENT market price (Paperback) in {currency_symbol} for the {region_code} market.
         Return ONLY a raw JSON list. No markdown.
         Format: [ {{ "Title": "Book Title", "Price": 14.99, "Rating": 5 }} ]
         """
-        
-        # Try multiple endpoints and aliases to prevent 404
-        for version in ['v1', 'v1beta']:
-            try:
-                client = genai.Client(api_key=api_key, http_options={'api_version': version})
-                for m_id in ["gemini-1.5-flash", "models/gemini-1.5-flash"]:
-                    try:
-                        response = client.models.generate_content(model=m_id, contents=prompt)
-                        if response and response.text:
-                            text_data = re.sub(r'```json\n|\n```', '', response.text).strip()
-                            data = json.loads(text_data)
-                            
-                            enhanced_db = []
-                            for item in data:
-                                link1, link2, label1, label2 = get_market_links(item['Title'], region_code)
-                                enhanced_db.append({
-                                    "Title": item['Title'], 
-                                    "Price": float(item['Price']), 
-                                    "Rating": int(item['Rating']),
-                                    "Link1": link1, "Link2": link2, 
-                                    "Label1": label1, "Label2": label2
-                                })
-                            return enhanced_db
-                    except: continue
-            except: continue
-    except Exception as e:
-        print(f"Neural Engine Final Error: {e}")
-        return None
 
+        # 2. Direct call to Gemini 2.0 Flash (No more loops needed)
+        response = client.models.generate_content(
+            model="gemini-2.0-flash", 
+            contents=prompt
+        )
+
+        if response and response.text:
+            # Clean response text (removes ```json formatting if present)
+            text_data = re.sub(r'```json\n|\n```', '', response.text).strip()
+            data = json.loads(text_data)
+            
+            enhanced_db = []
+            for item in data:
+                link1, link2, label1, label2 = get_market_links(item['Title'], region_code)
+                enhanced_db.append({
+                    "Title": item['Title'], 
+                    "Price": float(item['Price']), 
+                    "Rating": int(item['Rating']),
+                    "Link1": link1, "Link2": link2, 
+                    "Label1": label1, "Label2": label2
+                })
+            return enhanced_db
+
+    except Exception as e:
+        # Using Streamlit's error box instead of just printing to terminal
+        st.sidebar.error(f"Neural Engine Error: {e}")
+        return None
 
 def simulation_protocol(genre, region_code):
     """
