@@ -139,7 +139,7 @@ def gemini_search_protocol(api_key, genre, region_code, currency_symbol):
 
         # 2. Direct call to Gemini 2.0 Flash (No more loops needed)
         response = client.models.generate_content(
-            model="gemini-2.0-flash", 
+            model="gemini-1.5-flash", 
             contents=prompt
         )
 
